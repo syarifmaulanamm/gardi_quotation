@@ -1,0 +1,88 @@
+.card .category span {
+    margin-right: 10px;
+    font-style: italic;
+}
+ul.card-option {
+    list-style: none;    
+}
+ul.card-option a.btn-cog {
+    text-decoration: none;
+    color: #aaaaaa;
+    cursor: pointer;
+}
+
+/* OS GRID */
+.osgrid {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.osgrid-hotel .osgrid-image {
+    width: 35%;
+    float: left;
+    padding: 10px;
+}
+
+.osgrid-hotel .osgrid-image img {
+    width: 100%;
+}
+
+.osgrid-hotel .osgrid-content {
+    width: calc(65% - 20px);
+    float: left;
+    padding: 10px;
+}
+
+.osgrid-hotel .osgrid-title {
+    font-size: 18pt;
+    line-height: 20pt;
+    margin-top: 0px;
+}
+
+.osgrid-hotel .osgrid-stars {
+    color: #F7CA18;
+}
+
+.osgrid-hotel .osgrid-type {
+    color: darkgray;
+    font-size: 8pt;
+}
+
+.osgrid-hotel .osgrid-price {
+    font-weight: bold;
+    font-size: 15pt;
+}
+
+.osgrid-hotel .osgrid-trigger {
+    text-decoration: none;
+    color: darkgrey;
+    cursor: pointer;
+    right: 10px;
+    top: 7px;
+    position: absolute;
+}
+
+.osgrid-hotel .osgrid-popover {
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+}
+
+.osgrid-hotel .osgrid-popover .osgrid-popover-btn {
+    margin: auto;
+    margin-top: 15%;
+    width: 200px;
+    text-align: center;
+}
+
+.search-form .input-group-addon, .search-form .form-control {
+    border:0;
+}
