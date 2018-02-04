@@ -29,19 +29,22 @@
             </div>
         </div>
     </div>
+</div>
+<div class="row">
+@foreach($quotations as $item)
     <div class="col-md-4">
         <div class="card">
             <div class="header">
-                <h4 class="title"><i class="fa fa-circle text-success"></i> 9 Hari Umrah Muhasabah</h4>
+                <h4 class="title"><i class="fa fa-circle text-success"></i> {{ $item->tour_name }}</h4>
                 <div class="category">
                     <span>
-                        <i class="ion-pricetag"></i> Umrah
+                        <i class="ion-pricetag"></i> {{ $item->cat->name }}
                     </span>
                     <span>
-                        <i class="ion-cash"></i> USD
+                        <i class="ion-cash"></i> {{ $item->cur->code }}
                     </span>
                     <span>
-                        <i class="ion-person"></i> Imam Hanafi
+                        <i class="ion-person"></i> {{ $item->author->fullname }}
                     </span>
                 </div>
             </div>
@@ -49,7 +52,7 @@
                 <div class="footer">
                     <hr>
                     <div class="category">
-                        <small><i class="ion-clock"></i> Validity 12 November 2018</small>
+                        <small><i class="ion-clock"></i> Validity {{ date('d M Y', strtotime($item->validity)) }}</small>
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
@@ -58,7 +61,7 @@
                                     <i class="ion-gear-b"></i>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#"><i class="ion-edit"></i> Edit</a></li>
+                                    <li><a href="{{ url('quotation/basket/'.$item->id) }}"><i class="ion-edit"></i> Edit</a></li>
                                     <li><a href="#"><i class="ion-trash-b"></i> Delete</a></li>
                                 </ul>
                             </li>
@@ -68,89 +71,8 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="header">
-                <h4 class="title"><i class="fa fa-circle text-success"></i> 9 Hari Umrah Muhasabah</h4>
-                <div class="category">
-                    <span>
-                        <i class="ion-pricetag"></i> Umrah
-                    </span>
-                    <span>
-                        <i class="ion-cash"></i> USD
-                    </span>
-                    <span>
-                        <i class="ion-person"></i> Imam Hanafi
-                    </span>
-                </div>
-            </div>
-            <div class="content">   
-                <div class="footer">
-                    <hr>
-                    <div class="category">
-                        <small><i class="ion-clock"></i> Validity 12 November 2018</small>
-                    </div>
-                    <div class="pull-right">
-                        <ul class="card-option">
-                            <li class="dropdown">
-                                <a class="btn-cog dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="ion-gear-b"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#"><i class="ion-edit"></i> Edit</a></li>
-                                    <li><a href="#"><i class="ion-trash-b"></i> Delete</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="header">
-                <h4 class="title"><i class="fa fa-circle text-success"></i> 9 Hari Umrah Muhasabah</h4>
-                <div class="category">
-                    <span>
-                        <i class="ion-pricetag"></i> Umrah
-                    </span>
-                    <span>
-                        <i class="ion-cash"></i> USD
-                    </span>
-                    <span>
-                        <i class="ion-person"></i> Imam Hanafi
-                    </span>
-                </div>
-            </div>
-            <div class="content">   
-                <div class="footer">
-                    <hr>
-                    <div class="category">
-                        <small><i class="ion-clock"></i> Validity 12 November 2018</small>
-                    </div>
-                    <div class="pull-right">
-                        <ul class="card-option">
-                            <li class="dropdown">
-                                <a class="btn-cog dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="ion-gear-b"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#"><i class="ion-eye"></i> See Quotation</a></li>
-                                    <li><a href="#"><i class="ion-edit"></i> Edit</a></li>
-                                    <li><a href="#"><i class="ion-trash-b"></i> Delete</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+@endforeach
+</div>
 
-    <div class="col-md-12">
-        <hr>
-    </div>   
-</div>  
+{{ $quotations->links() }}
 @endsection

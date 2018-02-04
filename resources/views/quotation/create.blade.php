@@ -14,22 +14,36 @@
 {{ csrf_field() }}
     <div class="form-group">
         <label>Name Of Tour</label>
-        <input type="text" name="name" class="form-control" required autofocus>
+        <input type="text" name="tour_name" class="form-control" required autofocus>
     </div>
     <div class="form-group">
         <label>Category</label>
-        <select name="category" class="form-control" required>
-            <option value="0">Select Category</option>
+        <select name="category_id" class="form-control" required>
+            @foreach($category as $item)
+            <option value="{{ $item->id }}">{{ ucwords($item->name) }}</option>
+            @endforeach
         </select>
     </div>
     <div class="form-group">
+        <label>Number Of Pax</label>
+        <input type="number" name="number_of_pax" class="form-control" required>
+    </div>
+    <div class="form-group">
         <label>Currency</label>
-        <select name="currency" class="form-control" required>
-            <option value="0">Select Currency</option>
-            <option value="idr">IDR</option>
-            <option value="usd">USD</option>
-            <option value="eur">EURO</option>
+        <select name="currency_id" class="form-control" required>
+        @foreach($currency as $item)
+        <option value="{{ $item->id }}">{{ '('.ucwords($item->code.') '.$item->name) }}</option>
+        @endforeach
         </select>
+    </div>
+    <div class="form-group">
+        <label>Validity</label>
+        <div class='input-group'>
+            <input type='date' name="validity" class="form-control" />
+            <span class="input-group-addon">
+                <span class="ion-calendar"></span>
+            </span>
+        </div>
     </div>
     <button type="submit" class="btn btn-primary">Save changes</button>
 </form>

@@ -5,22 +5,29 @@
 @section('content')
 <form action="{{ url('quotation/update') }}" method="post">
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="form-group">
             <label>Category</label>
             <select name="category" class="form-control" required>
-                <option value="0">Select Category</option>
+            @foreach($category as $item)
+            <option value="{{ $item->id }}" @if($quot->category_id == $item->id) selected @endif >{{ ucwords($item->name) }}</option>
+            @endforeach
             </select>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
+        <div class="form-group">
+            <label>Number Of Pax</label>
+            <input type="number" name="number_of_pax" class="form-control" value="{{ $quot->number_of_pax }}" required>
+        </div>
+    </div>
+    <div class="col-md-2">
         <div class="form-group">
             <label>Currency</label>
             <select name="currency" class="form-control" required>
-                <option value="0">Select Currency</option>
-                <option value="idr">IDR</option>
-                <option value="usd">USD</option>
-                <option value="eur">EURO</option>
+            @foreach($currency as $item)
+            <option value="{{ $item->id }}" @if($quot->currency_id == $item->id) selected @endif >{{ '('.ucwords($item->code.') '.$item->name) }}</option>
+            @endforeach
             </select>
         </div>
     </div>
@@ -28,7 +35,7 @@
         <div class="form-group">
             <label>Validity</label>
             <div class='input-group'>
-                <input type='date' name="validity" class="form-control" />
+                <input type='date' name="validity" value="{{ $quot->validity }}" class="form-control" />
                 <span class="input-group-addon">
                     <span class="ion-calendar"></span>
                 </span>
@@ -38,7 +45,7 @@
     <div class="col-md-3">
         <div class="form-group">
             <label>Author</label>
-            <input type="text" name="author" class="form-control" value="{{ Session::get('login_data')['fullname'] }}" readonly>
+            <input type="text" name="author" class="form-control" value="{{ $quot->author->fullname }}" readonly>
         </div>
     </div>
 </div>
@@ -57,7 +64,7 @@
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
-                            <li><a href="{{ url('quotations/fixedcost/update') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
+                            <li><a href="{{ url('quotation/'.$quot->id.'/fixedcost') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -77,7 +84,7 @@
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
-                            <li><a href="{{ url('quotations/variablecost/update') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
+                            <li><a href="{{ url('quotation/'.$quot->id.'/variablecost') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -97,7 +104,7 @@
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
-                            <li><a href="{{ url('quotations/otherexpensive/update') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
+                            <li><a href="{{ url('quotation/'.$quot->id.'/otherexpensive') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -117,7 +124,7 @@
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
-                            <li><a href="{{ url('quotations/fixedcost/update') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
+                            <li><a href="{{ url('quotation/'.$quot->id.'/fixedcost') }}" class="btn-cog"><i class="ion-gear-b"></i></a></li>
                         </ul>
                     </div>
                 </div>
@@ -135,30 +142,52 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Miscellaneous</label>
-                            <input type="text" name="miscellaneous" class="form-control">
+                            <label>Incentive Staff</label>
+                            <select name="incentive_staff" class="form-control">
+                                <option value="10000">10,000 (Domestic)</option>
+                                <option value="15000">15,000 (Asean)</option>
+                                <option value="50000">50,000 (Asia, Middle East & Umrah Promo)</option>
+                                <option value="60000">60,000 (Aussie & New Zealand)</option>
+                                <option value="80000">80,000 (Europe & Africa)</option>
+                                <option value="100000">100,000 (USA, Canada, Leisure Series, Umrah Reguler & Plus)</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label>CN</label>
-                            <input type="text" name="cn" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Incentive</label>
-                            <input type="text" name="incentive" class="form-control">
+                            <label>Commission Sales</label>
+                            <select name="commission_sales" class="form-control">
+                                <option value="30000">30,000 (Domestic)</option>
+                                <option value="50000">50,000 (Asean)</option>
+                                <option value="100000">100,000 (Asia, Middle East, Aussie & New Zealand)</option>
+                                <option value="200000">200,000 (USA, Canada, Europe & Africa)</option>
+                                <option value="500000">500,000 (Leisure Series & Umrah Promo)</option>
+                                <option value="1000000">1,000,000 (Umrah Reguler & Plus)</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Agent Comms</label>
-                            <input type="text" name="agent_comms" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Discount</label>
-                            <input type="text" name="discount" class="form-control">
+                            <label>CN</label>
+                            <input type="text" name="cn" class="form-control currency">
                         </div>
                         <div class="form-group">
                             <label>Profit</label>
-                            <input type="text" name="profit" class="form-control">
+                            <select name="profit" class="form-control">
+                                <option value="15">15%</option>
+                                <option value="16">16%</option>
+                                <option value="17">17%</option>
+                                <option value="18">18%</option>
+                                <option value="19">19%</option>
+                                <option value="20">20%</option>
+                                <option value="21">21%</option>
+                                <option value="22">22%</option>
+                                <option value="23">23%</option>
+                                <option value="24">24%</option>
+                                <option value="25">25%</option>
+                                <option value="26">26%</option>
+                                <option value="27">27%</option>
+                                <option value="28">28%</option>
+                                <option value="29">29%</option>
+                            </select>
                         </div>
                     </div>
                 </div>

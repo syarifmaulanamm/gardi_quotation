@@ -31,6 +31,9 @@
 
     <!-- SweetAlert -->
     <link href="{{ asset('bower_components\bootstrap-sweetalert\dist\sweetalert.css') }}" rel="stylesheet" />
+
+    <!-- Bootstrap Select -->
+    <link href="{{ asset('assets/css/bootstrap-select.min.css') }}" rel="stylesheet" />
 </head>
 <body>
 
@@ -180,6 +183,9 @@
     <!--  Notifications Plugin    -->
     <script src="{{ asset('assets/js/bootstrap-notify.js') }}"></script>
 
+    <!-- Bootstrap Select -->
+    <script src="{{ asset('assets/js/bootstrap-select.min.js') }}"></script>
+
     <!-- Rating -->
     <script src="{{ asset('bower_components\bootstrap-star-rating\js\star-rating.min.js') }}"></script>
     <script src="{{ asset('bower_components\bootstrap-star-rating\themes\krajee-svg\theme.min.js') }}"></script>
@@ -227,26 +233,7 @@
 					$this.val( function() {
 						return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
 					} );
-            } );
-		
-		/**
-		 * ==================================
-		 * When Form Submitted
-		 * ==================================
-		 */
-		// $form.on( "submit", function( event ) {
-			
-		// 	var $this = $( this );
-		// 	var arr = $this.serializeArray();
-		
-		// 	for (var i = 0; i < arr.length; i++) {
-		// 			arr[i].value = arr[i].value.replace(/[($)\s\._\-]+/g, ''); // Sanitize the values.
-		// 	};
-			
-		// 	console.log( arr );
-			
-		// 	event.preventDefault();
-		// });
+            }); 
 
     	});
 	</script>

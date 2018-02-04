@@ -86,3 +86,17 @@ ul.card-option a.btn-cog {
 .search-form .input-group-addon, .search-form .form-control {
     border:0;
 }
+
+/* Title */
+.widget-title {
+    font-size: 14pt;
+    border-bottom: 3px solid #e3f2fd;
+    padding: 10px 0px;
+    margin-bottom: 10px;
+}
+
+.carousel-inner > .item > img {
+    margin: 0 auto;
+    max-height: 300px;
+    width: 100%;
+}

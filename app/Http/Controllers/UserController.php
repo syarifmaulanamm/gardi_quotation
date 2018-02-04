@@ -24,11 +24,12 @@ class UserController extends Controller
         $check = DB::table('users')
                 ->where('username', $username)
                 ->first();
-        
+                
         if($check)
         {
             if(Hash::check($password, $check->password)){
                 $data = array(
+                    'id' => $check->id,
                     'username' => $check->username,
                     'fullname' => $check->fullname,
                     'email' => $check->email,
