@@ -100,3 +100,62 @@ ul.card-option a.btn-cog {
     max-height: 300px;
     width: 100%;
 }
+
+/* Card */
+.card.muted {
+    background-color: #e0e0e0 !important;
+    color: #e0e0e0 !important;
+}
+
+.card.muted .title, .card.muted .category {
+    color: #d0d0d0 !important;
+}
+.card.muted .card-option {
+    display: none;
+}
+
+.card.focus {
+    animation: blueShadow 2s infinite;
+    transition: all 2s ease-in-out;
+}
+
+.card.danger {
+    animation: redShadow 2s infinite;
+    transition: all 2s ease-in-out;
+}
+
+@keyframes blueShadow {
+    0% {
+        -webkit-box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+        -moz-box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+        box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+    }
+    50% {
+        -webkit-box-shadow: 0px 0px 30px 0px rgba(33,114,255,0.36);
+        -moz-box-shadow: 0px 0px 30px 0px rgba(33,114,255,0.36);
+        box-shadow: 0px 0px 30px 0px rgba(33,114,255,0.36);
+    }
+    100% {
+        -webkit-box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+        -moz-box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+        box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);
+    }
+}
+
+@keyframes redShadow {
+    0% {
+        -webkit-box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+        -moz-box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+        box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+    }
+    50% {
+        -webkit-box-shadow: 0px 0px 30px 0px rgba(255,33,33,1);
+        -moz-box-shadow: 0px 0px 30px 0px rgba(255,33,33,1);
+        box-shadow: 0px 0px 30px 0px rgba(255,33,33,1);
+    }
+    100% {
+        -webkit-box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+        -moz-box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+        box-shadow: 0px 0px 12px 0px rgba(255,33,33,1);
+    }
+}

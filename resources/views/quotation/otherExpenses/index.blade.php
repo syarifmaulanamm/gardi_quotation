@@ -26,10 +26,10 @@
             <tbody>
                 <tr>
                     <td class="text-center" colspan="7">
-                        <a href="{{ url('quotation/'.$quotation->id.'/fixedcost/create') }}" class="btn btn-round btn-primary"><i class="ion-plus"></i> Add Fixed Cost</a>
+                        <a href="{{ url('quotation/'.$quotation->id.'/otherexpenses/create') }}" class="btn btn-round btn-primary"><i class="ion-plus"></i> Add Other Expenses</a>
                     </td>
                 </tr>
-                @foreach($fixedCost as $item)
+                @foreach($otherExpenses as $item)
                 <tr>
                     <td><strong>{{ $item->item }}</strong></td>
                     <td>{{ $item->remarks }}</td>
@@ -39,7 +39,7 @@
                     <td>{{ $item->duration }}</td>
                     <td>{{ number_format($item->amount, 0, ',', ',') }}</td>
                     <td class="text-center">
-                        <button class="btn btn-success btn-fill btn-sm" onclick="document.location='{{ url("quotation/fixedcost/update/$item->id") }}'"><i class="ion-edit"></i> Edit</button>  
+                        <button class="btn btn-success btn-fill btn-sm" onclick="document.location='{{ url("quotation/otherexpenses/update/$item->id") }}'"><i class="ion-edit"></i> Edit</button>  
                         <button class="btn btn-danger btn-fill btn-sm btn-delete" data-id="{{ $item->id }}"><i class="ion-trash-b"></i> Delete</button> 
                     </td>
                 </tr>
@@ -80,7 +80,7 @@
             },
             function(){
                 $.ajax({
-                    url: '{{ url('quotation/fixedcost') }}/'+id,
+                    url: '{{ url('quotation/otherexpenses') }}/'+id,
                     data: { _method: 'delete', _token : token },
                     type: 'post',
                     success: function(data){

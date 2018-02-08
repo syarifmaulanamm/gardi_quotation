@@ -35,7 +35,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="header">
-                <h4 class="title"><i class="fa fa-circle text-success"></i> {{ $item->tour_name }}</h4>
+                <h4 class="title"><i class="fa fa-circle text-success"></i> {{ substr($item->tour_name, 0, 23) }}{{ strlen($item->tour_name) > 23 ? '...' : '' }}</h4>
                 <div class="category">
                     <span>
                         <i class="ion-pricetag"></i> {{ $item->cat->name }}

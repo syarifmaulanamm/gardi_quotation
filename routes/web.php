@@ -42,38 +42,41 @@ Route::group(['middleware' => ['login']], function () {
 
     // Fixed Cost
     Route::get('quotation/{id}/fixedcost', 'QuotationController@fixedCost');
-    Route::get('quotation/{id}/fixedcost/create', 'QuotationController@createFixedCost');
-    
-    // Fixed Cost
-    // Route::get('quotation/fixedcost/create', 'QuotationController@createFixedCost');
-    // Route::post('quotation/fixedcost/create', 'QuotationController@doCreateFixedCost');
-    // Route::get('quotation/fixedcost/update/{id}', 'QuotationController@updateFixedCost');
-    // Route::post('quotation/fixedcost/update/{id}', 'QuotationController@doUpdateFixedCost');
-    // Route::delete('quotation/fixedcost/{id}', 'QuotationController@deleteFixedCost');
+    Route::get('quotation/{id}/fixedcost/create/', 'QuotationController@createFixedCost');
+    Route::post('quotation/{id}/fixedcost/create/', 'QuotationController@doCreateFixedCost');
+    Route::get('quotation/fixedcost/update/{id}', 'QuotationController@updateFixedCost');
+    Route::post('quotation/fixedcost/update/{id}', 'QuotationController@doUpdateFixedCost');
+    Route::delete('quotation/fixedcost/{id}', 'QuotationController@deleteFixedCost');
     // Route::get('quotation/fixedcost/{id}', 'QuotationController@fixedCost');
 
     // Variable Cost
-    // Route::get('quotation/variablecost/create', 'QuotationController@createVariableCost');
-    // Route::post('quotation/variablecost/create', 'QuotationController@doCreateVariableCost');
-    // Route::get('quotation/variablecost/update/{id}', 'QuotationController@updateVariableCost');
-    // Route::post('quotation/variablecost/update/{id}', 'QuotationController@doUpdateVariableCost');
-    // Route::delete('quotation/variablecost/{id}', 'QuotationController@deleteVariableCost');
+    Route::get('quotation/{id}/variablecost', 'QuotationController@variableCost');
+    Route::get('quotation/{id}/variablecost/create/', 'QuotationController@createVariableCost');
+    Route::post('quotation/{id}/variablecost/create/', 'QuotationController@doCreateVariableCost');
+    Route::get('quotation/variablecost/update/{id}', 'QuotationController@updateVariableCost');
+    Route::post('quotation/variablecost/update/{id}', 'QuotationController@doUpdateVariableCost');
+    Route::delete('quotation/variablecost/{id}', 'QuotationController@deleteVariableCost');
     // Route::get('quotation/variablecost/{id}', 'QuotationController@variableCost');
 
     // Other Expenses
-    // Route::get('quotation/otherexpenses/create', 'QuotationController@createOtherExpenses');
-    // Route::post('quotation/otherexpenses/create', 'QuotationController@doCreateOtherExpenses');
-    // Route::get('quotation/otherexpenses/update/{id}', 'QuotationController@updateOtherExpenses');
-    // Route::post('quotation/otherexpenses/update/{id}', 'QuotationController@doUpdateOtherExpenses');
-    // Route::delete('quotation/otherexpenses/{id}', 'QuotationController@deleteOtherExpenses');
+    Route::get('quotation/{id}/otherexpenses', 'QuotationController@otherExpenses');
+    Route::get('quotation/{id}/otherexpenses/create/', 'QuotationController@createOtherExpenses');
+    Route::post('quotation/{id}/otherexpenses/create/', 'QuotationController@doCreateOtherExpenses');
+    Route::get('quotation/otherexpenses/update/{id}', 'QuotationController@updateOtherExpenses');
+    Route::post('quotation/otherexpenses/update/{id}', 'QuotationController@doUpdateOtherExpenses');
+    Route::delete('quotation/otherexpenses/{id}', 'QuotationController@deleteOtherExpenses');
     // Route::get('quotation/otherexpenses/{id}', 'QuotationController@otherExpenses');
 
     // Land Arrangement
-    // Route::get('quotation/landarrangement/create', 'QuotationController@createLandArrangement');
-    // Route::post('quotation/landarrangement/create', 'QuotationController@doCreateLandArrangement');
-    // Route::get('quotation/landarrangement/update/{id}', 'QuotationController@updateLandArrangement');
-    // Route::post('quotation/landarrangement/update/{id}', 'QuotationController@doUpdateLandArrangement');
-    // Route::delete('quotation/landarrangement/{id}', 'QuotationController@deleteLandArrangement');
+    Route::get('quotation/{id}/landarrangement', 'QuotationController@landArrangement');
+    Route::get('quotation/{id}/landarrangement/manual', 'QuotationController@landArrangementManual');
+    Route::get('quotation/{id}/landarrangement/create/', 'QuotationController@createLandArrangement');
+    Route::get('quotation/{id}/landarrangement/manual/create/', 'QuotationController@createLandArrangementManual');
+    Route::post('quotation/{id}/landarrangement/create/', 'QuotationController@doCreateLandArrangement');
+    Route::get('quotation/landarrangement/update/{id}', 'QuotationController@updateLandArrangement');
+    Route::get('quotation/landarrangement/manual/update/{id}', 'QuotationController@updateLandArrangement');
+    Route::post('quotation/landarrangement/update/{id}', 'QuotationController@doUpdateLandArrangement');
+    Route::delete('quotation/landarrangement/{id}', 'QuotationController@deleteLandArrangement');
     // Route::get('quotation/landarrangement/{id}', 'QuotationController@landArrangement');
 
     // Quotation Items

@@ -67,6 +67,7 @@
                         <p>Quotation</p>
                     </a>
                 </li>
+                @if(Session::get('login_data')['level'] == 1)
                 <li>
                     <a href="{{ url('hotel') }}">
                         <i class="pe-7s-culture"></i>
@@ -97,6 +98,7 @@
                         <p>Settings</p>
                     </a>
                 </li>
+                @endif
             </ul>
     	</div>
     </div>
@@ -111,7 +113,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href='{{ url()->previous() }}'><i class="ion-chevron-left"></i></a>
+                    <a class="navbar-brand" href='{{ isset($url_back) ? $url_back : url()->previous() }}'><i class="ion-chevron-left"></i></a>
                     <a class="navbar-brand" href="#">{{ ucwords($title) }}</a>
                 </div>
                 <div class="collapse navbar-collapse">
@@ -199,6 +201,9 @@
 
     <!-- SweetAlert -->
     <script src="{{ asset('bower_components\bootstrap-sweetalert\dist\sweetalert.min.js') }}"></script>
+
+    <!-- Number -->
+    <script src="{{ asset('assets/js/jquery.number.min.js') }}"></script>
     
 	<script type="text/javascript">
     	$(document).ready(function(){
@@ -234,7 +239,6 @@
 						return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
 					} );
             }); 
-
     	});
 	</script>
     @yield('js')

@@ -16,29 +16,25 @@
         <label>Item</label>
         <select name="item" class="form-control">
             @foreach($items as $item)
-            <option value="{{ $item->name }}">{{ $item->name }}</option>
+            <option value="{{ $item->name }}" @if($oe->item == $item->name) selected @endif>{{ $item->name }}</option>
             @endforeach
         </select>
     </div>
     <div class="form-group">
-        <label>Description</label>
-        <input type="text" name="remarks" class="form-control">
-    </div>
-    <div class="form-group">
         <label>Price</label>
-        <input type="text" name="price" class="form-control currency" id="price">
+        <input type="text" name="price" class="form-control currency" value="{{ number_format($oe->price, 0, ',', ',') }}" id="price">
     </div>
     <div class="form-group">
         <label>Quantity</label>
-        <input type="number" min="1" name="quantity" value="1" class="form-control" id="qty">
+        <input type="number" min="1" name="quantity" class="form-control" value="{{ $oe->quantity }}" id="qty">
     </div>
     <div class="form-group">
         <label>Duration</label>
-        <input type="number" min="1" name="duration" value="1" class="form-control" id="dur">
+        <input type="number" min="1" name="duration" class="form-control" value="{{ $oe->duration }}" id="dur">
     </div>
     <div class="form-group">
         <label>Amount</label>
-        <input type="text" name="amount" readonly class="form-control currency" id="amount">
+        <input type="text" name="amount" readonly class="form-control currency" value="{{ number_format($oe->amount, 0, ',', ',') }}" id="amount">
     </div>
     <button type="submit" class="btn btn-primary">Save changes</button>
 </form>

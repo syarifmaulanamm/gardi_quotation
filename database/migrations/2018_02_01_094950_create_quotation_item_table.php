@@ -16,6 +16,8 @@ class CreateQuotationItemTable extends Migration
         Schema::create('quotation_item', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('block');
+            $table->boolean('required');
             $table->timestamps();
         });
     }

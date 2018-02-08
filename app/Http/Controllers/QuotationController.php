@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Validator;
 use Illuminate\Http\Request;
 use App\Quotation;
+use App\QuotationFill;
 use App\QuotationCategory;
 use App\QuotationItems;
 use App\Currency;
 use App\FixedCost;
 use App\VariableCost;
+use App\OtherExpenses;
+use App\LandArrangement;
 
 class QuotationController extends Controller
 {
@@ -60,6 +63,10 @@ class QuotationController extends Controller
         $quot->user_id = $request->session()->get('login_data')['id'];
         $quot->save();
 
+        $qFill = new QuotationFill;
+        $qFill->quotation_id = $quot->id;
+        $qFill->save();
+
         $request->session()->flash('msg', 'Quotation berhasil disimpan!');
         return redirect('quotation/basket/'.$quot->id);
     }
@@ -73,7 +80,80 @@ class QuotationController extends Controller
         $data['quot'] = Quotation::find($id);
         $data['category'] = QuotationCategory::orderBy('name', 'asc')->get(); 
         $data['currency'] = Currency::orderBy('code', 'asc')->get(); 
-        $data['title'] = ucwords($data['quot']->tour_name); 
+        $data['title'] = 'Create Quotation'; 
+        $data['url_back'] = url('quotation');
+        $data['qFill'] = QuotationFill::where('quotation_id', $id)->first();
+
+        // Fixed Cost
+        $FCcreated = FixedCost::where('quotation_id', $id)->pluck('item')->toArray();
+        $FCrequired = QuotationItems::where('block', 1)->where('required',1)->pluck('name')->toArray();
+
+        if(!in_array($FCrequired[0], $FCcreated)){
+            $dFC = array();
+            
+            for($i = 0; $i < count($FCrequired); $i++){
+                $dFC[] = array(
+                    'quotation_id' => $id,
+                    'item' => $FCrequired[$i],
+                    'currency' => $data['quot']->currency_id,
+                    'price' => 0,
+                    'quantity' => 0,
+                    'duration' => 0,
+                    'amount' => 0,
+                    'remarks' => ''
+                );
+            }
+
+            FixedCost::insert($dFC);
+        }
+
+        // Variable Cost
+        $VCcreated = VariableCost::where('quotation_id', $id)->pluck('item')->toArray();
+        $VCrequired = QuotationItems::where('block', 2)->where('required',1)->pluck('name')->toArray();
+
+        if(!in_array($VCrequired[0], $VCcreated)){
+            $dVC = array();
+            
+            for($i = 0; $i < count($VCrequired); $i++){
+                $dVC[] = array(
+                    'quotation_id' => $id,
+                    'item' => $VCrequired[$i],
+                    'currency' => $data['quot']->currency_id,
+                    'price' => 0,
+                    'quantity' => 0,
+                    'duration' => 0,
+                    'amount' => 0,
+                    'remarks' => ''
+                );
+            }
+
+            VariableCost::insert($dVC);
+        }
+
+        // Other Expenses
+        $OEcreated = OtherExpenses::where('quotation_id', $id)->pluck('item')->toArray();
+        $OErequired = QuotationItems::where('block', 3)->where('required',1)->pluck('name')->toArray();
+
+        if(!in_array($OErequired[0], $OEcreated)){
+            $dOE = array();
+            
+            for($i = 0; $i < count($OErequired); $i++){
+                $dOE[] = array(
+                    'quotation_id' => $id,
+                    'item' => $OErequired[$i],
+                    'currency' => $data['quot']->currency_id,
+                    'price' => 0,
+                    'quantity' => 0,
+                    'duration' => 0,
+                    'amount' => 0,
+                    'remarks' => ''
+                );
+            }
+
+            OtherExpenses::insert($dOE);
+        }
+
+
         return view('quotation/basket', $data);
     }   
 
@@ -86,8 +166,24 @@ class QuotationController extends Controller
         }
 
         $data['quotation'] = Quotation::find($id);
-        $data['fixedCost'] = FixedCost::where('quotation_id', $id);
+        $data['fixedCost'] = FixedCost::where('quotation_id', $id)->get();
         $data['title'] = 'Fixed Cost'; 
+        $data['url_back'] = url('quotation/basket/'.$id);
+
+        if($data['quotation']->sum_fixed_cost() == 0){
+            $dQFill = array(
+                'fixed_cost_completed' => 0,
+                'fixed_cost_errors' => ''
+            );
+        }else{
+            $dQFill = array(
+                'fixed_cost_completed' => 1,
+                'fixed_cost_errors' => ''
+            );
+        }
+        
+        $qFill = QuotationFill::where('quotation_id', $id)->update($dQFill);
+        
         return view('quotation/fixedCost/index', $data);
     }
     // Create
@@ -99,9 +195,537 @@ class QuotationController extends Controller
         }
 
         $data['quotation'] = Quotation::find($id);
-        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
-        $data['currency'] = Currency::orderBy('code', 'asc')->get(); 
+        $data['items'] = QuotationItems::where('block', 1)->orderBy('name', 'asc')->get();
         $data['title'] = 'Add Fixed Cost'; 
         return view('quotation/fixedCost/create', $data);
+    }
+
+    public function doCreateFixedCost(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/fixedcost');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('quotation/'.$id.'/fixedcost/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+
+        $quotation = Quotation::find($id);
+
+        $fc = new FixedCost;
+        $fc->quotation_id = $id;
+        $fc->currency = $quotation->currency_id;
+        $fc->item = $request->item;
+        $fc->price = str_replace(',', '', $request->price);
+        $fc->quantity = $request->quantity;
+        $fc->duration = $request->duration;
+        $fc->amount = str_replace(',', '', $request->amount);
+        $fc->remarks = $request->remarks;
+        $fc->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$id.'/fixedcost');
+    }
+
+    // Update
+    public function updateFixedCost(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $data['fc'] = FixedCost::find($id);
+        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
+        $data['title'] = 'Edit Fixed Cost Item'; 
+        return view('quotation/fixedCost/update', $data);
+    }
+
+    public function doUpdateFixedCost(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+        
+        $fc = FixedCost::find($id);
+
+        if ($validator->fails()) {
+            return redirect('quotation/fixedcost/update/'.$id)
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+        
+        $fc->item = $request->item;
+        $fc->price = str_replace(',', '', $request->price);
+        $fc->quantity = $request->quantity;
+        $fc->duration = $request->duration;
+        $fc->amount = str_replace(',', '', $request->amount);
+        $fc->remarks = $request->remarks;
+        $fc->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$fc->quotation_id.'/fixedcost');
+    }
+
+    // Delete
+    public function deleteFixedCost(Request $request, $id)
+    {
+        if($id){
+            $fc = FixedCost::find($id);
+            $fc->delete();
+
+            return response()->json(array('success' => true));
+        }
+    }
+
+    /**
+     * Variable Cost
+     */
+
+    public function variableCost(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['variableCost'] = VariableCost::where('quotation_id', $id)->paginate(10);
+        $data['title'] = 'Variable Cost'; 
+        $data['url_back'] = url('quotation/basket/'.$id);
+
+        if($data['quotation']->sum_variable_cost() == 0){
+            $dQFill = array(
+                'variable_cost_completed' => 0,
+                'variable_cost_errors' => ''
+            );
+        }else{
+            $dQFill = array(
+                'variable_cost_completed' => 1,
+                'variable_cost_errors' => ''
+            );
+        }
+        
+        $qFill = QuotationFill::where('quotation_id', $id)->update($dQFill);
+
+        return view('quotation/variableCost/index', $data);
+    }
+    // Create
+    public function createVariableCost(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/variablecost');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['items'] = QuotationItems::where('block', 2)->orderBy('name', 'asc')->get();
+        $data['title'] = 'Add Variable Cost'; 
+        return view('quotation/variableCost/create', $data);
+    }
+
+    public function doCreateVariableCost(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/variablecost');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('quotation/'.$id.'/variablecost/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+
+        $quotation = Quotation::find($id);
+
+        $vc = new VariableCost;
+        $vc->quotation_id = $id;
+        $vc->currency = $quotation->currency_id;
+        $vc->item = $request->item;
+        $vc->price = str_replace(',', '', $request->price);
+        $vc->quantity = $request->quantity;
+        $vc->duration = $request->duration;
+        $vc->amount = str_replace(',', '', $request->amount);
+        $vc->remarks = $request->remarks;
+        $vc->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$id.'/variablecost');
+    }
+
+    // Update
+    public function updateVariableCost(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $data['vc'] = VariableCost::find($id);
+        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
+        $data['title'] = 'Edit Variable Cost Item'; 
+        return view('quotation/variableCost/update', $data);
+    }
+
+    public function doUpdateVariableCost(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+        
+        $vc = VariableCost::find($id);
+
+        if ($validator->fails()) {
+            return redirect('quotation/variablecost/update/'.$id)
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+        
+        $vc->item = $request->item;
+        $vc->price = str_replace(',', '', $request->price);
+        $vc->quantity = $request->quantity;
+        $vc->duration = $request->duration;
+        $vc->amount = str_replace(',', '', $request->amount);
+        $vc->remarks = $request->remarks;
+        $vc->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$vc->quotation_id.'/variablecost');
+    }
+
+    // Delete
+    public function deleteVariableCost(Request $request, $id)
+    {
+        if($id){
+            $vc = VariableCost::find($id);
+            $vc->delete();
+
+            return response()->json(array('success' => true));
+        }
+    }
+
+
+    /**
+     * Other Expenses
+     */
+
+    public function otherExpenses(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['otherExpenses'] = OtherExpenses::where('quotation_id', $id)->paginate(10);
+        $data['title'] = 'Other Expenses'; 
+        $data['url_back'] = url('quotation/basket/'.$id);
+        
+        if($data['quotation']->sum_variable_cost() == 0){
+            $dQFill = array(
+                'other_expenses_completed' => 0,
+                'other_expenses_errors' => ''
+            );
+        }else{
+            $dQFill = array(
+                'other_expenses_completed' => 1,
+                'other_expenses_errors' => ''
+            );
+        }
+        
+        $qFill = QuotationFill::where('quotation_id', $id)->update($dQFill);
+
+        return view('quotation/otherExpenses/index', $data);
+    }
+    // Create
+    public function createOtherExpenses(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/otherexpenses');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['items'] = QuotationItems::where('block', 3)->orderBy('name', 'asc')->get();
+        $data['title'] = 'Add Other Expenses'; 
+        return view('quotation/otherExpenses/create', $data);
+    }
+
+    public function doCreateOtherExpenses(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/otherexpenses');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('quotation/'.$id.'/otherexpenses/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+
+        $quotation = Quotation::find($id);
+
+        $oe = new OtherExpenses;
+        $oe->quotation_id = $id;
+        $oe->currency = $quotation->currency_id;
+        $oe->item = $request->item;
+        $oe->price = str_replace(',', '', $request->price);
+        $oe->quantity = $request->quantity;
+        $oe->duration = $request->duration;
+        $oe->amount = str_replace(',', '', $request->amount);
+        $oe->remarks = $request->remarks;
+        $oe->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$id.'/otherexpenses');
+    }
+
+    // Update
+    public function updateOtherExpenses(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $data['oe'] = OtherExpenses::find($id);
+        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
+        $data['title'] = 'Edit Other Expenses Item'; 
+        return view('quotation/otherExpenses/update', $data);
+    }
+
+    public function doUpdateOtherExpenses(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+        
+        $oe = OtherExpenses::find($id);
+
+        if ($validator->fails()) {
+            return redirect('quotation/otherexpenses/update/'.$id)
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+        
+        $oe->item = $request->item;
+        $oe->price = str_replace(',', '', $request->price);
+        $oe->quantity = $request->quantity;
+        $oe->duration = $request->duration;
+        $oe->amount = str_replace(',', '', $request->amount);
+        $oe->remarks = $request->remarks;
+        $oe->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$oe->quotation_id.'/otherexpenses');
+    }
+
+    // Delete
+    public function deleteOtherExpenses(Request $request, $id)
+    {
+        if($id){
+            $oe = OtherExpenses::find($id);
+            $oe->delete();
+
+            return response()->json(array('success' => true));
+        }
+    }
+
+
+    /**
+     * Land Arrangement
+     */
+
+    public function landArrangement(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['landArrangement'] = LandArrangement::where('quotation_id', $id)->paginate(10);
+        $data['url_back'] = url('quotation/basket/'.$id);
+
+        if($data['quotation']->sum_land_arrangement() == 0){
+            $dQFill = array(
+                'land_arrangement_completed' => 0,
+                'land_arrangement_errors' => ''
+            );
+        }else{
+            $dQFill = array(
+                'land_arrangement_completed' => 1,
+                'land_arrangement_errors' => ''
+            );
+        }
+        
+        $qFill = QuotationFill::where('quotation_id', $id)->update($dQFill);
+
+        if($request->mode == 'manual'){
+            $data['title'] = '[Manual] Land Arrangement'; 
+            return view('quotation/landArrangement/index_manual', $data);
+        }else{
+            $data['title'] = 'Land Arrangement';             
+            return view('quotation/landArrangement/index', $data);
+        }
+    }
+    // Create
+    public function createLandArrangement(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/landarrangement');
+        }
+
+        $data['quotation'] = Quotation::find($id);
+        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
+        $data['title'] = 'Add Land Arrangement'; 
+        return view('quotation/landArrangement/create', $data);
+    }
+
+    public function doCreateLandArrangement(Request $request, $id)
+    {
+
+        if(!$id){
+            return redirect('quotation/'.$id.'/landarrangement');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+
+        $quotation = Quotation::find($id);
+
+        $la = new LandArrangement;
+        $la->quotation_id = $id;
+        $la->currency = $quotation->currency_id;
+        $la->item = $request->item;
+        $la->price = str_replace(',', '', $request->price);
+        $la->quantity = $request->quantity;
+        $la->duration = $request->duration;
+        $la->amount = str_replace(',', '', $request->amount);
+        $la->remarks = $request->remarks;
+        $la->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$id.'/landarrangement');
+    }
+
+    // Update
+    public function updateLandArrangement(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $data['la'] = LandArrangement::find($id);
+        $data['items'] = QuotationItems::orderBy('name', 'asc')->get();
+        $data['title'] = 'Edit Land Arrangement Item'; 
+        return view('quotation/landArrangement/update', $data);
+    }
+
+    public function doUpdateLandArrangement(Request $request, $id)
+    {
+        if(!$id){
+            return redirect()->back();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'item' => 'required',
+            'price' => 'required',
+            'quantity' => 'required',
+            'duration' => 'required',
+            'amount' => 'required'
+        ]);
+        
+        $la = LandArrangement::find($id);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                        ->withErrors($validator)
+                        ->withInput();
+        } 
+        
+        $la->item = $request->item;
+        $la->price = str_replace(',', '', $request->price);
+        $la->quantity = $request->quantity;
+        $la->duration = $request->duration;
+        $la->amount = str_replace(',', '', $request->amount);
+        $la->remarks = $request->remarks;
+        $la->save();
+
+        $request->session()->flash('msg', 'Data berhasil disimpan!');
+        return redirect('quotation/'.$la->quotation_id.'/landarrangement');
+    }
+
+    // Delete
+    public function deleteLandArrangement(Request $request, $id)
+    {
+        if($id){
+            $la = LandArrangement::find($id);
+            $la->delete();
+
+            return response()->json(array('success' => true));
+        }
     }
 }

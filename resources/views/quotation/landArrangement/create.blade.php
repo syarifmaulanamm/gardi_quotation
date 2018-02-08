@@ -15,13 +15,15 @@
     <div class="form-group">
         <label>Item</label>
         <select name="item" class="form-control">
-            @foreach($items as $item)
-            <option value="{{ $item->name }}">{{ $item->name }}</option>
-            @endforeach
+            <option value="la" selected>Land Arrangement</option>
         </select>
     </div>
     <div class="form-group">
         <label>Description</label>
+        <input type="text" name="remarks" class="form-control" placeholder="LA Name">
+    </div>
+    <div class="form-group" id="remarks">
+        <label></label>
         <input type="text" name="remarks" class="form-control">
     </div>
     <div class="form-group">
@@ -47,6 +49,7 @@
 @section('js')
 <script>
     $(document).ready(function(){
+        $("#remarks").hide();
         $('#price').on('keyup', function(){
             getAmount();
         });
