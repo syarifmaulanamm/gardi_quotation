@@ -32,7 +32,7 @@
         <label>Currency</label>
         <select name="currency_id" class="form-control" required>
         @foreach($currency as $item)
-        <option value="{{ $item->id }}">{{ '('.ucwords($item->code.') '.$item->name) }}</option>
+        <option value="{{ $item->id }}" @if($item->code == 'IDR') selected @endif>{{ '('.ucwords($item->code.') '.$item->name) }}</option>
         @endforeach
         </select>
     </div>

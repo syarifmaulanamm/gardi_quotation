@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>@yield('title')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <!-- Bootstrap core CSS     -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
 
@@ -17,14 +17,15 @@
 
     <!-- Ion Icons -->
     <link href="{{ asset('bower_components\Ionicons\css\ionicons.min.css') }}" rel="stylesheet"/>
-    
+
     <!-- App.css -->
     <link href="{{ asset('assets/css/app.css') }}" rel="stylesheet" />
-    
+
     <!--     Fonts and icons     -->
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="{{ asset('assets/css/pe-icon-7-stroke.css') }}" rel="stylesheet" />
-    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <!-- Rating -->
     <link href="{{ asset('bower_components\bootstrap-star-rating\css\star-rating.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('bower_components\bootstrap-star-rating\themes\krajee-uni\theme.min.css') }}" rel="stylesheet" />
@@ -34,6 +35,12 @@
 
     <!-- Bootstrap Select -->
     <link href="{{ asset('assets/css/bootstrap-select.min.css') }}" rel="stylesheet" />
+
+    <!-- Data Tables -->
+    <link href="{{ asset('assets/css/dataTables.bootstrap.min.css') }}" rel="stylesheet" />
+
+    <!-- Intro -->
+    <link href="{{ asset('assets/css/introjs.min.css') }}" rel="stylesheet" />
 </head>
 <body>
 
@@ -131,11 +138,14 @@
                                 <i class="ion-person"></i> {{ Session::get('login_data')['fullname'] }}
                             </a>
                             <ul class="dropdown-menu">
-                            <li><a href="#">Notification 1</a></li>
-                            <li><a href="#">Notification 2</a></li>
-                            <li><a href="#">Notification 3</a></li>
-                            <li><a href="#">Notification 4</a></li>
-                            <li><a href="#">Another notification</a></li>
+                              <li><a href="{{ url('user/' . Session::get('login_data')['id']) }}">My Profile</a></li>
+                              <li><a href="{{ url('user/change-password/'.Session::get('login_data')['id']) }}">Change Password</a></li>
+
+                              @if(Session::get('login_data')['level'] == 1)
+                              <li class="divider"></li>
+                              <li><a href="{{ url('user') }}">Manage Users</a></li>
+                              @endif
+
                             </ul>
                         </li>
                         <li>
@@ -197,14 +207,20 @@
 
     <!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
 	<script src="{{ asset('assets/js/light-bootstrap-dashboard.js?v=1.4.0') }}"></script>
-    <script src="https://use.fontawesome.com/3e4a71a224.js"></script>
 
     <!-- SweetAlert -->
     <script src="{{ asset('bower_components\bootstrap-sweetalert\dist\sweetalert.min.js') }}"></script>
 
     <!-- Number -->
     <script src="{{ asset('assets/js/jquery.number.min.js') }}"></script>
-    
+
+    <!-- Datatables -->
+    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.bootstrap.min.js') }}"></script>
+
+    <!-- Intro -->
+    <script src="{{ asset('assets/js/intro.min.js') }}"></script>
+
 	<script type="text/javascript">
     	$(document).ready(function(){
 
@@ -220,25 +236,31 @@
 
             $(".rating").rating();
 
+            $('.datatables').DataTable({
+                responsive: true
+            });
+
+            introJs().start();
+
             $( "body" ).on( "keyup", ".currency", function( event ) {
-			
+
                 // When the arrow keys are pressed, abort.
                 if ( $.inArray( event.keyCode, [38,40,37,39] ) !== -1 ) {
                     return;
                 }
-			
+
                 var $this = $( this );
-			
+
                 // Get the value.
                 var input = $this.val();
-			
+
                 var input = input.replace(/[\D\s\._\-]+/g, "");
 					input = input ? parseInt( input, 10 ) : 0;
 
 					$this.val( function() {
 						return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
 					} );
-            }); 
+            });
     	});
 	</script>
     @yield('js')

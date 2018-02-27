@@ -17,19 +17,26 @@ Route::get('logout', 'UserController@logout');
 Route::post('logout', 'UserController@doLogout');
 
 Route::group(['middleware' => ['login']], function () {
+    // Users
+    Route::get('user/change-avatar/{id}', 'UserController@changeAvatar');
+    Route::post('user/update/{id}', 'UserController@doUpdate');
+    Route::get('user/change-password/{id}', 'UserController@changePassword');
+    Route::get('user', 'UserController@get');
+    Route::get('user/{id}', 'UserController@get');
 
     Route::get('/', 'QuotationController@list');
     Route::get('home', 'QuotationController@list');
-    /** 
+    /**
      * QUOTATION
      */
     Route::get('quotation', 'QuotationController@list');
     Route::get('quotation/create', 'QuotationController@create');
     Route::post('quotation/create', 'QuotationController@doCreate');
-    Route::post('quotation/{id}', 'QuotationController@update');
+    Route::post('quotation/update/{id}', 'QuotationController@doUpdate');
     Route::delete('quotation/{id}', 'QuotationController@delete');
     Route::get('quotation/basket/{id}', 'QuotationController@basket');
     Route::get('quotation/{id}', 'QuotationController@get');
+    Route::get('quotation/download/{id}/{type}', 'QuotationController@download');
 
     // Quotation Categories
     Route::get('quotation/categories', 'QuotationController@categories');
@@ -146,7 +153,7 @@ Route::group(['middleware' => ['login']], function () {
     Route::get('hotel/bed-type/update/{id}', 'HotelController@updateBedType');
     Route::post('hotel/bed-type/update/{id}', 'HotelController@doUpdateBedType');
     Route::delete('hotel/bed-type/{id}', 'HotelController@deleteBedType');
-    
+
     /**
      * VISA
      */

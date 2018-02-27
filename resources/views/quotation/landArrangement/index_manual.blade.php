@@ -39,7 +39,7 @@
                     <td>{{ $item->duration }}</td>
                     <td>{{ number_format($item->amount, 0, ',', ',') }}</td>
                     <td class="text-center">
-                        <button class="btn btn-success btn-fill btn-sm" onclick="document.location='{{ url("quotation/landarrangement/update/$item->id") }}'"><i class="ion-edit"></i> Edit</button>  
+                        <button class="btn btn-success btn-fill btn-sm" onclick="document.location='{{ url("quotation/landarrangement/update/$item->id?mode=manual") }}'"><i class="ion-edit"></i> Edit</button>  
                         <button class="btn btn-danger btn-fill btn-sm btn-delete" data-id="{{ $item->id }}"><i class="ion-trash-b"></i> Delete</button> 
                     </td>
                 </tr>

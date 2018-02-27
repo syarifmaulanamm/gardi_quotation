@@ -10,14 +10,12 @@
 {{ Session::get('errors') }}
 </div>
 @endif
-<form action="{{ url()->current() }}" method="post">
+<form action="{{ url('quotation/landarrangement/update/'.$la->id.'?mode=manual') }}" method="post">
 {{ csrf_field() }}
     <div class="form-group">
         <label>Item</label>
         <select name="item" class="form-control">
-            @foreach($items as $item)
-            <option value="{{ $item->name }}" @if($la->item == $item->name) selected @endif>{{ $item->name }}</option>
-            @endforeach
+            <option value="Land Arrangement" selected>Land Arrangement</option>
         </select>
     </div>
     <div class="form-group">

@@ -12,4 +12,10 @@ class Hotel extends Model
         'feature' => 'array',
         'images' => 'array',
     ];
+
+    // Rooms
+    public function rooms()
+    {
+        return $this->hasMany('App\HotelRoom', 'hotel_id', 'id');
+    }
 }

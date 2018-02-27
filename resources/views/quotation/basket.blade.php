@@ -3,9 +3,17 @@
 @section('title', $title)
 
 @section('content')
-<div class="alert alert-danger" id="alert"></div>
-<form action="{{ url('quotation/update') }}" method="post">
-<div class="row">
+
+@if (Session::has('errors'))
+<div class="alert alert-danger alert-dismissable text-center">
+<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+{{ Session::get('errors') }}
+</div>
+@endif
+
+<form action="{{ url('quotation/update/'.$quot->id) }}" method="post">
+{{ csrf_field() }}
+<div class="row" data-step="1" data-intro="Quotation Details">
     <div class="col-md-4">
         <div class="form-group">
             <label>Name Of Tour</label>
@@ -15,7 +23,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label>Category</label>
-            <select name="category" class="form-control" required>
+            <select name="category_id" class="form-control" required>
             @foreach($category as $item)
             <option value="{{ $item->id }}" @if($quot->category_id == $item->id) selected @endif >{{ ucwords($item->name) }}</option>
             @endforeach
@@ -31,7 +39,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label>Currency</label>
-            <select name="currency" class="form-control" required>
+            <select name="currency_id" class="form-control" required>
             @foreach($currency as $item)
             <option value="{{ $item->id }}" @if($quot->currency_id == $item->id) selected @endif >{{ '('.ucwords($item->code.') '.$item->name) }}</option>
             @endforeach
@@ -59,11 +67,11 @@
 <hr>
 <div class="row">
     <div class="col-md-6">
-        <div class="card" id="fc">
+        <div class="card" id="fc" data-step="2" data-intro="Fixed Cost : Biaya tetap yang tidak berubah karena frekuensi atau jumlah.">
             <div class="header">
                 <h4 class="title">Fixed Cost</h4>
             </div>
-            <div class="content">   
+            <div class="content">
                 <div class="footer">
                     <hr>
                     <div class="category">
@@ -79,15 +87,15 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card muted" id="vc">
+        <div class="card muted" id="vc" data-step="3" data-intro="Variable Cost : Biaya yang berubah karena jumlah atau frekuensi, sifatnya perorangan.">
             <div class="header">
                 <h4 class="title">Variable Cost</h4>
             </div>
-            <div class="content">   
+            <div class="content">
                 <div class="footer">
                     <hr>
                     <div class="category">
-                        <p>{{ number_format($quot->sum_variable_cost(), 0, ',', ',') }}</p>
+                        <p>{{ number_format(($quot->sum_variable_cost() / $quot->number_of_pax), 0, ',', ',') }}</p>
                     </div>
                     <div class="pull-right">
                         <ul class="card-option">
@@ -99,11 +107,11 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card muted" id="oe">
+        <div class="card muted" id="oe" data-step="4" data-intro="Other Expenses">
             <div class="header">
                 <h4 class="title">Other Expenses</h4>
             </div>
-            <div class="content">   
+            <div class="content">
                 <div class="footer">
                     <hr>
                     <div class="category">
@@ -119,11 +127,11 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card muted" id="la">
+        <div class="card muted" id="la" data-step="5" data-intro="Land Arrangement">
             <div class="header">
                 <h4 class="title">Land Arrangement</h4>
             </div>
-            <div class="content">   
+            <div class="content">
                 <div class="footer">
                     <hr>
                     <div class="category">
@@ -141,84 +149,88 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <div class="card muted" id="summary">
-            <div class="header">
-                <h4 class="title">Summary</h4>
-            </div>
-            <div class="content">   
+        <div class="card muted" id="summary" data-step="6" data-intro="Tentukan Incentive Staff, Commission Sales, CN dan Profit. Dan dapatkan harga jual quotation Anda.">
+            <div class="content">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Incentive Staff</label>
-                            <select name="incentive_staff" class="form-control">
-                                <option value="10000">10,000 (Domestic)</option>
-                                <option value="15000">15,000 (Asean)</option>
-                                <option value="50000">50,000 (Asia, Middle East & Umrah Promo)</option>
-                                <option value="60000">60,000 (Aussie & New Zealand)</option>
-                                <option value="80000">80,000 (Europe & Africa)</option>
-                                <option value="100000">100,000 (USA, Canada, Leisure Series, Umrah Reguler & Plus)</option>
-                            </select>
+                            @if($quot->cur->code == 'IDR')
+                              <select name="incentive_staff" class="form-control">
+                              @foreach($ar_incentive as $item)
+                              <option value="{{ $item['nominal'] }}" @if($quot->incentive_staff == $item['nominal']) selected @endif>{{ $item['nominal'] }} {{ $item['description'] }}</option>
+                              @endforeach
+                              </select>
+                            @elseif($quot->cur->code == 'USD')
+                              <select name="incentive_staff" class="form-control">
+                              @foreach($ar_incentive as $item)
+                              <option value="{{ $item['nominal_usd'] }}" @if($quot->incentive_staff == $item['nominal_usd']) selected @endif>{{ $item['nominal_usd'] }} {{ $item['description'] }}</option>
+                              @endforeach
+                              </select>
+                            @endif
                         </div>
                         <div class="form-group">
                             <label>Commission Sales</label>
-                            <select name="commission_sales" class="form-control">
-                                <option value="30000">30,000 (Domestic)</option>
-                                <option value="50000">50,000 (Asean)</option>
-                                <option value="100000">100,000 (Asia, Middle East, Aussie & New Zealand)</option>
-                                <option value="200000">200,000 (USA, Canada, Europe & Africa)</option>
-                                <option value="500000">500,000 (Leisure Series & Umrah Promo)</option>
-                                <option value="1000000">1,000,000 (Umrah Reguler & Plus)</option>
-                            </select>
+                            @if($quot->cur->code == 'IDR')
+                              <select name="commission_sales" class="form-control">
+                              @foreach($ar_commission as $item)
+                              <option value="{{ $item['nominal'] }}" @if($quot->incentive_staff == $item['nominal']) selected @endif>{{ $item['nominal'] }} {{ $item['description'] }}</option>
+                              @endforeach
+                              </select>
+                            @elseif($quot->cur->code == 'USD')
+                              <select name="commission_sales" class="form-control">
+                              @foreach($ar_commission as $item)
+                              <option value="{{ $item['nominal_usd'] }}" @if($quot->incentive_staff == $item['nominal_usd']) selected @endif>{{ $item['nominal_usd'] }} {{ $item['description'] }}</option>
+                              @endforeach
+                              </select>
+                            @endif
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="form-group">
                             <label>CN</label>
-                            <input type="text" name="cn" class="form-control currency">
+                            <input type="text" name="cn" value="0" class="form-control currency">
                         </div>
                         <div class="form-group">
                             <label>Profit</label>
                             <select name="profit" class="form-control">
-                                <option value="15">15%</option>
-                                <option value="16">16%</option>
-                                <option value="17">17%</option>
-                                <option value="18">18%</option>
-                                <option value="19">19%</option>
-                                <option value="20">20%</option>
-                                <option value="21">21%</option>
-                                <option value="22">22%</option>
-                                <option value="23">23%</option>
-                                <option value="24">24%</option>
-                                <option value="25">25%</option>
-                                <option value="26">26%</option>
-                                <option value="27">27%</option>
-                                <option value="28">28%</option>
-                                <option value="29">29%</option>
+                            @foreach($ar_profit as $k=>$v)
+                            <option value="{{ $k }}" @if($quot->profit == $k) selected @endif>{{ $v }}</option>
+                            @endforeach
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <table class="table table-responsive table-striped">
+                            <tr>
+                                <th>Net Per Pax</th>
+                                <td class="text-right"><span id="netPerPax">-</span></td>
+                            </tr>
+                            <tr>
+                                <th>PPN 1%</th>
+                                <td class="text-right"><span id="ppn">-</span></td>
+                            </tr>
+                            <tr>
+                                <th>Selling Price</th>
+                                <td class="text-right" style="color: #0984e3"><h2>{{ $quot->cur->code }} <span id="sellingPrice"></span></h2></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
-                
-                <table class="table table-responsive table-bordered">
-                    <tr>
-                        <th>Net Per Pax</th>
-                        <th>Selling Price</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><h2>10,000</h2></td>
-                        <td>PPN 1% = 120</td>
-                    </tr>
-                    <tr>
-                        <td><h2>12,000</h2></td>
-                    </tr>
-                </table>
             </div>
         </div>
     </div>
 </div>
 <div class="pull-right">
-    <button class="btn btn-primary" disabled><i class="ion-checkmark-round"></i> Save Changes</button>
+    <button class="btn btn-primary btn-fill" id="btnSave" disabled  data-step="7" data-intro="Klik untuk menyimpan perubahan"><i class="ion-checkmark-round"></i> Save Changes</button>
 </div>
+
+<!-- Default Value -->
+<input type="hidden" value="{{ $quot->sum_fixed_cost() }}" id="valFC">
+<input type="hidden" value="{{ $quot->sum_variable_cost() / $quot->number_of_pax }}" id="valVC">
+<input type="hidden" value="{{ $quot->sum_other_expenses() }}" id="valOE">
+<input type="hidden" value="{{ $quot->sum_land_arrangement() }}" id="valLA">
+<input type="hidden" name="net_per_pax">
+<input type="hidden" name="ppn1">
+<input type="hidden" name="selling_price">
 </form>
 
 <!-- Modal -->
@@ -246,6 +258,20 @@ $(document).ready(function(){
     $("#alert").css('display', 'none');
     $("#summary :input").prop("disabled", true);
 
+    getPrice();
+
+    $("body").on('change', 'input', function(){
+        getPrice();
+    });
+
+    $("body").on('change', 'select', function(){
+        getPrice();
+    });
+
+    @if(URL::previous() != url('quotation/create'))
+    introJs().exit();
+    @endif
+
     @if($qFill->fixed_cost_completed == NULL)
     doAct(1);
     @elseif($qFill->fixed_cost_completed != NULL && $qFill->variable_cost_completed == NULL)
@@ -256,8 +282,35 @@ $(document).ready(function(){
     doAct(4);
     @elseif($qFill->land_arrangement_completed != NULL && $qFill->summary_completed == NULL)
     doAct(5);
-    @endif 
+    @endif
 });
+
+function getPrice(){
+    var fc = Math.ceil(parseInt($("#valFC").val()));
+    var vc = Math.ceil(parseInt($("#valVC").val()));
+    var oe = Math.ceil(parseInt($("#valOE").val()));
+    var la = Math.ceil(parseInt($("#valLA").val()));
+    var is = Math.ceil($("select[name='incentive_staff']").val());
+    var cs = Math.ceil($("select[name='commission_sales']").val());
+    var cn = Math.ceil($("input[name='cn']").val());
+    var profit = Math.ceil(parseInt($("select[name='profit']").val()));
+
+    // var net = Math.ceil(fc + vc + oe + la + is + cs + cn);
+    var net = fc + vc + oe + la + is + cs + cn;
+    var netProfit = Math.ceil(net + (net * profit / 100));
+    var ppn = Math.ceil(netProfit * 1 / 100);
+    var selling = Math.ceil(netProfit + ppn);
+
+    $("#netPerPax").html($.number( netProfit, 0, ',' ));
+    $("#ppn").html($.number( ppn, 0, ',' ));
+    $("#sellingPrice").html($.number( selling, 0, ',' ));
+
+    $("input[name='net_per_pax']").val($.number( netProfit, 0, ',' ));
+    $("input[name='ppn1'").val($.number( ppn, 0, ',' ));
+    $("input[name='selling_price']").val($.number( selling, 0, ',' ));
+
+    console.log(is);
+}
 
 function doAct(step){
     if(step == 1){
@@ -299,6 +352,7 @@ function doAct(step){
         $("#vc").removeClass('muted');
         $("#oe").removeClass('muted');
         $("#summary :input").prop("disabled", false);
+        $("#btnSave").prop("disabled", false);
         @else
         $("#la").addClass('danger');
         @endif

@@ -124,6 +124,13 @@ ul.card-option a.btn-cog {
     transition: all 2s ease-in-out;
 }
 
+.table-blue {
+    /* background-color: #0984e3 !important; */
+    color: #0984e3;
+    padding: 10px;
+    border-color: #0984e3 !important;
+}
+
 @keyframes blueShadow {
     0% {
         -webkit-box-shadow: 0px 0px 12px 0px rgba(33,114,255,0.36);

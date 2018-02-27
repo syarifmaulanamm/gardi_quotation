@@ -15,7 +15,7 @@
     <div class="form-group">
         <label>Item</label>
         <select name="item" class="form-control">
-            <option value="la" selected>Land Arrangement</option>
+            <option value="Land Arrangement" selected>Land Arrangement</option>
         </select>
     </div>
     <div class="form-group">
